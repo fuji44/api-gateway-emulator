@@ -7,13 +7,21 @@ import { readFileSync } from "fs";
 
 type AuthenticatedRequest = Request & { user: object };
 
+class Logger {
+  static error(...messages: any[]) {
+    console.error("\x1b[31m", messages);
+  }
+  static info(...messages: any[]) {
+    console.log(messages);
+  }
+}
+
 function createAuthMiddleware(authType: string): express.RequestHandler {
   switch (authType) {
     case "dummy_jwt": {
       const jwtJsonPath = process.env.DUMMY_JWT_JSON;
       if (!jwtJsonPath) {
-        console.error(
-          "\x1b[31m",
+        Logger.error(
           "Error: If AUTH_TYPE=dummy_jwt, the environment variable DUMMY_JWT_JSON needs to be set to the path of the JWT file in JSON format."
         );
         process.exit(1);
@@ -21,25 +29,19 @@ function createAuthMiddleware(authType: string): express.RequestHandler {
       let jwt: object;
       try {
         jwt = JSON.parse(readFileSync(jwtJsonPath, "utf-8"));
-      } catch (error: any) {
-        if (error.code && error.code == "ENOENT") {
-          console.error(
-            "\x1b[31m",
+      } catch (e: any) {
+        if (e.code && e.code == "ENOENT") {
+          Logger.error(
             "Error: The file set to DUMMY_JWT_JSON cannot be found.",
             jwtJsonPath
           );
           process.exit(1);
         }
-        if (error instanceof SyntaxError) {
-          console.error(
-            "\x1b[31m",
-            "Error: Failed to parse JSON.",
-            error.message,
-            jwtJsonPath
-          );
+        if (e instanceof SyntaxError) {
+          Logger.error("Error: Failed to parse JSON.", e.message, jwtJsonPath);
           process.exit(1);
         }
-        throw error;
+        throw e;
       }
       return (req, res, next) => {
         (req as AuthenticatedRequest).user = jwt;
@@ -56,8 +58,7 @@ function createAuthMiddleware(authType: string): express.RequestHandler {
         : ["RS256"];
 
       if (!jwksUri || !issuer || !audience) {
-        console.error(
-          "\x1b[31m",
+        Logger.error(
           "Error: If AUTH_TYPE=jwks, the environment variables [OAUTH_JWKS_URI, OAUTH_ISSUER, OAUTH_AUDIENCE] must be set."
         );
         process.exit(1);
@@ -77,10 +78,7 @@ function createAuthMiddleware(authType: string): express.RequestHandler {
     }
 
     default:
-      console.error(
-        "\x1b[31m",
-        "Error: AUTH_TYPE must be one of [jwks, dummy_jwt]."
-      );
+      Logger.error("Error: AUTH_TYPE must be one of [jwks, dummy_jwt].");
       process.exit(1);
   }
 }
@@ -91,7 +89,7 @@ function errorHandler(
   res: Response,
   next: NextFunction
 ) {
-  console.error("\x1b[31m", err.stack);
+  Logger.error(err.stack);
   res.status(500);
   if (err.message) {
     res.send({ error: err.message });
@@ -104,8 +102,7 @@ function run() {
   const verbose = process.env.VERBOSE ? Boolean(process.env.VERBOSE) : false;
   const targetUrl = process.env.TARGET_URL;
   if (!targetUrl) {
-    console.error(
-      "\x1b[31m",
+    Logger.error(
       "Error: Required environment variables TARGET_URL are not defined."
     );
     process.exit(1);
@@ -123,7 +120,7 @@ function run() {
       changeOrigin: true,
       onProxyReq: (proxyReq, req, res, options) => {
         if (verbose) {
-          console.info(`before headers:`, proxyReq.getHeaders());
+          Logger.info(`before headers:`, proxyReq.getHeaders());
         }
 
         proxyReq.setHeader(
@@ -136,7 +133,7 @@ function run() {
         }
 
         if (verbose) {
-          console.info(`after headers:`, proxyReq.getHeaders());
+          Logger.info(`after headers:`, proxyReq.getHeaders());
         }
       },
     })
@@ -146,8 +143,8 @@ function run() {
   const port = process.env.PORT || 3000;
   app.listen(port);
 
-  console.log("Auth type:", authType);
-  console.log("Running Gateway:", `http://localhost:${port}`);
+  Logger.info("Auth type:", authType);
+  Logger.info("Running Gateway:", `http://localhost:${port}`);
 }
 
 run();
