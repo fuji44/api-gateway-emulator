@@ -98,53 +98,49 @@ function errorHandler(
   res.send({ error: err });
 }
 
-function run() {
-  const verbose = process.env.VERBOSE ? Boolean(process.env.VERBOSE) : false;
-  const targetUrl = process.env.TARGET_URL;
-  if (!targetUrl) {
-    Logger.error(
-      "Error: Required environment variables TARGET_URL are not defined."
-    );
-    process.exit(1);
-  }
-
-  const app = express();
-  const authType = process.env.AUTH_TYPE
-    ? process.env.AUTH_TYPE.toLowerCase()
-    : "jwks";
-  app.use(createAuthMiddleware(authType));
-  app.use(
-    process.env.BASE_PATH || "/",
-    createProxyMiddleware({
-      target: targetUrl,
-      changeOrigin: true,
-      onProxyReq: (proxyReq, req, res, options) => {
-        if (verbose) {
-          Logger.info(`before headers:`, proxyReq.getHeaders());
-        }
-
-        proxyReq.setHeader(
-          "x-apigateway-api-userinfo",
-          base64url.encode(JSON.stringify((req as AuthenticatedRequest).user))
-        );
-        const authorization = req.header("authorization");
-        if (authorization) {
-          proxyReq.setHeader("x-forwarded-authorization", authorization);
-        }
-
-        if (verbose) {
-          Logger.info(`after headers:`, proxyReq.getHeaders());
-        }
-      },
-    })
+const verbose = process.env.VERBOSE ? Boolean(process.env.VERBOSE) : false;
+const targetUrl = process.env.TARGET_URL;
+if (!targetUrl) {
+  Logger.error(
+    "Error: Required environment variables TARGET_URL are not defined."
   );
-  app.use(errorHandler);
-
-  const port = process.env.PORT || 3000;
-  app.listen(port);
-
-  Logger.info("Auth type:", authType);
-  Logger.info("Running Gateway:", `http://localhost:${port}`);
+  process.exit(1);
 }
 
-run();
+const app = express();
+const authType = process.env.AUTH_TYPE
+  ? process.env.AUTH_TYPE.toLowerCase()
+  : "jwks";
+app.use(createAuthMiddleware(authType));
+app.use(
+  process.env.BASE_PATH || "/",
+  createProxyMiddleware({
+    target: targetUrl,
+    changeOrigin: true,
+    onProxyReq: (proxyReq, req, res, options) => {
+      if (verbose) {
+        Logger.info(`before headers:`, proxyReq.getHeaders());
+      }
+
+      proxyReq.setHeader(
+        "x-apigateway-api-userinfo",
+        base64url.encode(JSON.stringify((req as AuthenticatedRequest).user))
+      );
+      const authorization = req.header("authorization");
+      if (authorization) {
+        proxyReq.setHeader("x-forwarded-authorization", authorization);
+      }
+
+      if (verbose) {
+        Logger.info(`after headers:`, proxyReq.getHeaders());
+      }
+    },
+  })
+);
+app.use(errorHandler);
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  Logger.info("Auth type:", authType);
+  Logger.info("Running Gateway:", `http://localhost:${port}`);
+});

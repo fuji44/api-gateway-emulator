@@ -11,6 +11,7 @@ Dockerfile
 test/
 
 # Env files
+temp/
 node_modules/
 .env
 
