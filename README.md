@@ -120,7 +120,7 @@ In order to pass JSON to the container, you need to mount the volume by specifyi
 
 ```sh
 docker run -it --rm -p 3000:3000 \
-  -v ./temp:/usr/local/api-gateway/temp \
+  -v $(pwd)/temp:/usr/local/api-gateway/temp \
   -e TARGET_URL="http://host.docker.internal:5050" \
   -e AUTH_TYPE="dummy_jwt" \
   -e DUMMY_JWT_JSON="/usr/local/api-gateway/temp/dummy-jwt.json" \
