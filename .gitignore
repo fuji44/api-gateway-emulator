@@ -1,0 +1,6 @@
+# Temp files
+dist
+
+# Env files
+node_modules
+.env

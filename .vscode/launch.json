@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Proxy",
+      "skipFiles": ["<node_internals>/**"],
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["dev"],
+      "cwd": "${workspaceFolder}",
+      "outFiles": ["${workspaceFolder}/**/*.js", "!**/node_modules/**"],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Dummy server",
+      "skipFiles": ["<node_internals>/**"],
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["start:dummy"],
+      "cwd": "${workspaceFolder}",
+      "outFiles": ["${workspaceFolder}/**/*.js", "!**/node_modules/**"],
+      "console": "integratedTerminal"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Proxy & Dummy server",
+      "configurations": ["Proxy", "Dummy server"]
+    }
+  ]
+}

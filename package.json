@@ -1,0 +1,25 @@
+{
+  "name": "api-gateway-emulator",
+  "version": "0.1.0",
+  "author": "fuji44",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "start": "node --require dotenv/config dist/src/server.js",
+    "dev": "ts-node --require dotenv/config src/server.ts",
+    "start:dummy": "ts-node --require dotenv/config test/dummy-target.ts"
+  },
+  "dependencies": {
+    "base64url": "^3.0.1",
+    "express": "^4.17.3",
+    "express-jwt": "^6.1.0",
+    "http-proxy-middleware": "^2.0.3",
+    "jwks-rsa": "^2.0.5",
+    "typescript": "^4.5.5"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "dotenv": "^16.0.0",
+    "ts-node": "^10.5.0"
+  }
+}

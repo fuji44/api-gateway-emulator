@@ -1,0 +1,15 @@
+{
+  // base: https://github.com/tsconfig/bases
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Node 16",
+  "compilerOptions": {
+    "target": "es2021",
+    "lib": ["es2021"],
+    "module": "commonjs",
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
+  }
+}

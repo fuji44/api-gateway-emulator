@@ -1,0 +1,21 @@
+# Dev tool files
+.devcontainer/
+.vscode/
+.git/
+.editorconfig
+.gitignore
+.dockerignore
+Dockerfile
+
+# Test files
+test/
+
+# Env files
+node_modules/
+.env
+
+# Temp files
+dist/
+
+# Documents
+README.md
