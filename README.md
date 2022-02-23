@@ -25,10 +25,10 @@ This is an example of authenticating with Auth0 and accessing the API on `localh
 yarn build
 
 # Run
-TARGET_URL=http://localhost:5050 \
-OAUTH_JWKS_URI=https://YOUR_TENANT_ID.auth0.com/.well-known/jwks.json \
-OAUTH_ISSUER=https://YOUR_TENANT_ID.auth0.com/ \
-OAUTH_AUDIENCE=YOUR_AUTH0_API_AUDIENCE \
+TARGET_URL="http://localhost:5050" \
+OAUTH_JWKS_URI="https://YOUR_AUTH0_TENANT_DOMAIN/.well-known/jwks.json" \
+OAUTH_ISSUER="https://YOUR_AUTH0_TENANT_DOMAIN/" \
+OAUTH_AUDIENCE="YOUR_AUTH0_API_AUDIENCE" \
 yarn start
 
 # Request target API resource via Gateway
@@ -47,8 +47,8 @@ docker pull fuji44/api-gateway-emulator
 # Run
 docker run -it --rm -p 3000:3000 \
   -e TARGET_URL="http://host.docker.internal:5050" \
-  -e OAUTH_JWKS_URI="https://YOUR_TENANT_DOMAIN/.well-known/jwks.json" \
-  -e OAUTH_ISSUER="https://YOUR_TENANT_DOMAIN/" \
+  -e OAUTH_JWKS_URI="https://YOUR_AUTH0_TENANT_DOMAIN/.well-known/jwks.json" \
+  -e OAUTH_ISSUER="https://YOUR_AUTH0_TENANT_DOMAIN/" \
   -e OAUTH_AUDIENCE="YOUR_AUTH0_API_AUDIENCE" \
   fuji44/api-gateway-emulator
 
@@ -86,8 +86,8 @@ If jwks is specified, the user information confirmed by the actual JWKS will be 
 ```ini
 # jwks type configs
 # e.g. Auth0
-OAUTH_JWKS_URI=https://YOUR_TENANT_ID.auth0.com/.well-known/jwks.json
-OAUTH_ISSUER=https://YOUR_TENANT_ID.auth0.com/
+OAUTH_JWKS_URI=https://YOUR_AUTH0_TENANT_DOMAIN/.well-known/jwks.json
+OAUTH_ISSUER=https://YOUR_AUTH0_TENANT_DOMAIN/
 OAUTH_AUDIENCE=YOUR_AUTH0_API_AUDIENCE
 # Option: comma-separated signing algorithms
 OAUTH_TOKEN_SIGN_ALGORITHMS=RS256
