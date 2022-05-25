@@ -112,6 +112,14 @@ const authType = process.env.AUTH_TYPE
   ? process.env.AUTH_TYPE.toLowerCase()
   : "jwks";
 app.use(createAuthMiddleware(authType));
+app.use((req: Request, res, next) => {
+  // Temporarily save Expect header because there is a problem that Proxy middleware is not called when Expect header is present.
+  if (req.headers.expect) {
+    req.params.__expectHeader = req.headers.expect;
+    delete req.headers.expect;
+  }
+  next();
+});
 app.use(
   process.env.BASE_PATH || "/",
   createProxyMiddleware({
@@ -120,6 +128,12 @@ app.use(
     onProxyReq: (proxyReq, req, res, options) => {
       if (verbose) {
         Logger.info(`before headers:`, proxyReq.getHeaders());
+      }
+
+      // Restore Expect header if it has been saved
+      if (req.params.__expectHeader) {
+        proxyReq.setHeader("Expect", req.params.__expectHeader);
+        delete req.params.__expectHeader;
       }
 
       proxyReq.setHeader(
